@@ -1,8 +1,14 @@
 
 
 exports.UploadSong = async(req,res)=>{
-    const musicID = req.query.id;
+   const files = req.files;
 
-    console.log(musicID);
-    res.send(`song has been received music id: ${musicID}`);
+   if(!files ||files.length === 0){
+        return res.status(404).json({message: 'Error! there are no files inputted'})
+   }
+   files.forEach(file => {
+        console.log(file);
+   });
+
+   return res.status(200).json({message: "Success"})
 }
