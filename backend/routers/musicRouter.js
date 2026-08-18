@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+//file handler
 const multer = require('multer');
 const musicController = require('../controller/musicController');
 const fs = require('fs');
@@ -16,8 +17,8 @@ const storage = multer.diskStorage({
     filename: function (req, file, callback){
 
         //fetch a file with the original name
-        filepath = path.join('../../songFolder', file.originalname);
-        console.log(filepath);
+        const filepath = path.join(__dirname,'../../SongFolder/', file.originalname);
+
         //checks if there is a file with the same name
         if(fs.existsSync(filepath)){
             //returns error if a file shares the same name of an already stored file

@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+//router path
 const musicFunc = require('./routers/musicRouter');
 
 //install muller to test and upload files to backend
