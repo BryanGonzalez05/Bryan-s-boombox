@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
     filename: function (req, file, callback){
 
         //fetch a file with the original name
-        const filepath = path.join(__dirname,'../../SongFolder/', file.originalname);
+        const filepath = path.join(__dirname,'../../SongFolder', file.originalname);
 
         //checks if there is a file with the same name
         if(fs.existsSync(filepath)){

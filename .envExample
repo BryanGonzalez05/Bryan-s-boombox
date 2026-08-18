@@ -1,0 +1,5 @@
+DATABASE_NAME = insert your db name here
+DATABASE_PORT = insert your port here
+DATABASE_HOST = insert your host here
+DATABASE_USER = insert your user here
+DATABASE_PASSWORD = insert your password here
