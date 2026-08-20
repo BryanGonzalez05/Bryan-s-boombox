@@ -1,5 +1,8 @@
+//create db connection and store filepath to db
+import db from '../db.js';
 
-exports.UploadSong = async(req,res)=>{
+
+export const UploadSong = async(req,res)=>{
      
    const files = req.files;
    
@@ -27,6 +30,8 @@ exports.UploadSong = async(req,res)=>{
 
      //store info to database
      console.log(`filename : ${match.originalname}\n artist name: ${si.artistName}`)
+
+     
    }
 
    files.forEach(file => {

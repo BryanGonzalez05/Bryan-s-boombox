@@ -1,10 +1,10 @@
-const express = require("express");
+import express from 'express'
 const router = express.Router();
 //file handler
-const multer = require('multer');
-const musicController = require('../controller/musicController');
-const fs = require('fs');
-const path = require('path');
+import multer from 'multer';
+import {UploadSong} from '../controller/musicController.js'
+import fs from 'fs';
+import path from 'path'
 
 //controls where to store the file 
 const storage = multer.diskStorage({
@@ -44,6 +44,6 @@ const fileFilter = (req,file, callback) =>{
 //create the middleware
 const upload = multer({storage: storage, fileFilter: fileFilter});
 
-router.post('/UploadSong', upload.array('files',10), musicController.UploadSong);
+router.post('/UploadSong', upload.array('files',10), UploadSong);
 
-module.exports = router;
+export default router;
