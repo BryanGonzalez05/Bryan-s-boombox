@@ -57,17 +57,24 @@ export const UploadSong = async(req,res)=>{
 export const deleteSong = async(req,res)=>{
      try{
           
+          //gets list of chosen song id 
           const songIds = req.body.songIds;
 
+          //iterates through them
           for(const id of songIds){
+
+               //searches for them in the db
                const [row] = await db.execute('select songPath from songLib where songID = ?', [id]);
 
+               //if nun found continue
                if(row.length === 0){
                     continue;
                }
 
+               //gets song path
                const songPath = row[0].songPath;
 
+               //waits for deletion of the directory 
                await fs.unlink(songPath, (err)=>{
                     if(err){
                          console.log(err.message);
@@ -78,10 +85,12 @@ export const deleteSong = async(req,res)=>{
                     }
                })
 
+               //deletes from the db
                await db.execute(`DELETE from songLib where songID = ?`, [id]);
 
           }
 
+          //return message
           return res.status(200).json({message: 'song library has been updated!'});
      }
      catch(error){
@@ -91,5 +100,21 @@ export const deleteSong = async(req,res)=>{
 }
 
 export const editSongName = async(req,res)=>{
-     
+     const songId = req.params.id;
+     const newName = req.body.newName;
+
+     try{
+
+          const [result] = await db.execute(`UPDATE songLib set songName = ? where songID = ?`, [newName,songId]);
+
+          if(result.affectedRows === 0){
+               return res.status(404).json({message: 'song not found!'})
+          }
+
+          return res.status(200).json({message: 'song updated!'})
+     }
+     catch(error){
+          console.log(error.message);
+          return res.status(500).json({message: 'Internal server error!'})
+     }
 }
