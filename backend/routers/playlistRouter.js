@@ -1,5 +1,5 @@
 import express from 'express';
-import {createPlaylist, deletePlaylist, editPlaylist} from '../controller/playlistControler.js';
+import {createPlaylist, deletePlaylist, editPlaylist} from '../controller/playlistController.js';
 const router = express.Router();
 
 

@@ -2,9 +2,9 @@ import express from 'express'
 const router = express.Router();
 //file handler
 import multer from 'multer';
-import {UploadSong, deleteSong, editSongName} from '../controller/musicController.js'
+import {UploadSong, deleteSong, editSongName} from '../controller/songController.js'
 import fs from 'fs';
-import path from 'path'
+import path from 'path';
 
 //controls where to store the file 
 const storage = multer.diskStorage({
