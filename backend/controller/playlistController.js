@@ -1,5 +1,6 @@
 import db from '../db.js';
 
+//implement playlist image
 export const createPlaylist = async (req,res) =>{
     try{
         const {PlaylistName, PlaylistDescription} = req.body;

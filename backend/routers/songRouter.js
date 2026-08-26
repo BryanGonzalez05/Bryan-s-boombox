@@ -2,7 +2,7 @@ import express from 'express'
 const router = express.Router();
 //file handler
 import multer from 'multer';
-import {UploadSong, deleteSong, editSongName} from '../controller/songController.js'
+import {UploadSong, deleteSong, editSongName, loadSongs} from '../controller/songController.js'
 import fs from 'fs';
 import path from 'path';
 
@@ -47,5 +47,6 @@ const upload = multer({storage: storage, fileFilter: fileFilter});
 router.post('/UploadSong', upload.array('files',10), UploadSong);
 router.delete('/deleteSong', deleteSong);
 router.put('/editSongName/:id', editSongName)
+router.get('/loadSongs/:offset', loadSongs);
 
 export default router;

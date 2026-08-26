@@ -1,11 +1,12 @@
 import db from '../db.js';
 import {parseFile} from 'music-metadata';
 import fs from 'fs';
+import path from 'path';
 
 export const UploadSong = async(req,res)=>{
    try{
        const files = req.files;
-       const default_IMG_path = '/SongFolder/SongImagePlaceHolder.webp';
+       const default_IMG_path = '/SongImage/SongImagePlaceHolder.webp';
        //checks if are files
        if(!files ||files.length === 0){
             return res.status(400).json({message: 'Error! there are no files inputted'})
@@ -117,4 +118,30 @@ export const editSongName = async(req,res)=>{
           console.log(error.message);
           return res.status(500).json({message: 'Internal server error!'})
      }
+}
+
+//loadSongs
+export const loadSongs = async (req,res) =>{
+    try{
+        const offset = req.params.offset;
+
+        const [result] = await db.execute(`
+               select songID, songName, artistName, duration, imagePath 
+               from songLib limit 20 offset ?`, [offset]);
+
+        console.log(result);
+
+        if(result.length === 0){
+            return res.status(400).json({message : 'No more songs to load!'});
+        }
+
+        
+        return res.status(200).json({message: 'song have been fetched', songs : result});
+    }
+    catch(error){
+        console.log(error.message);
+        console.log(error);
+
+        return res.status(500).json({message: 'Internal server error!'});
+    }
 }
