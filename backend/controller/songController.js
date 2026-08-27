@@ -120,7 +120,6 @@ export const editSongName = async(req,res)=>{
      }
 }
 
-//loadSongs
 export const loadSongs = async (req,res) =>{
     try{
         const offset = req.params.offset;

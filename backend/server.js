@@ -4,17 +4,26 @@ const app = express();
 import songRouter from './routers/songRouter.js';
 import playlistRouter from './routers/playlistRouter.js';
 
+
 //used to set incoming json to parse
 app.use(express.json());
 
 
 //fetches image from directory
 import path from 'path';
-//express.static is for handling static files like img, js , css etc
-//process.cwd means start from current directory 
-app.use('/SongImage', express.static(path.join(process.cwd(),'SongImage')))
 
-//do the same for playlist
+//used to access directory 
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
+//express.static is for handling static files like img, js , css etc
+//path joins the set varibles into a directory string
+//__dirname is the directory path in which the file is in
+app.use('/SongImage', express.static(path.join(__dirname, '..','SongImage')));
+app.use('/PlaylistImage', express.static(path.join(__dirname, '..', 'PlaylistImage')));
+
 
 app.use(`/song`,songRouter);
 app.use('/playlist', playlistRouter)
