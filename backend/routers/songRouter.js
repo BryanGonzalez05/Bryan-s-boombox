@@ -32,7 +32,7 @@ const storage = multer.diskStorage({
 //check if the file inputted is an audio file
 const allowedMimes = ['audio/mpeg', 'audio/ogg', 'audio/wav'];
 
-const fileFilter = (req,file, callback) =>{
+const fileFilter = (req, file, callback) =>{
     if(allowedMimes.includes(file.mimetype)){
         callback(null, true);
     } 

@@ -3,19 +3,35 @@ import db from '../db.js';
 //implement playlist image
 export const createPlaylist = async (req,res) =>{
     try{
-        const {PlaylistName, PlaylistDescription} = req.body;
+        const {PlaylistName, PlaylistDescription} = JSON.parse(req.body.playlistInfo);
 
-        if(!PlaylistName){
+
+        if(!PlaylistName?.trim()){
             return res.status(400).json({message: "PlayList name cannot be empty!"});
         }
 
-        const [result] = await db.execute(`select * from playlist where playlist_name = ?`, [PlaylistName]);
+        const [result] = await db.execute(`select * from playlist where playlist_name = ?`, [PlaylistName.trim()]);
 
         if(result.length > 0){
             return res.status(400).json({message: 'A Playlist already uses this name!'});
         }
 
-        await db.execute(`insert into playlist (playlist_name, playlist_description) values(?, ?)`, [PlaylistName.trim(), PlaylistDescription?.trim()]);
+        
+        if(!req.file){
+            const default_PL_IMG_Path = '/PlaylistImage/playlist-img-placeholder.webp';
+            await db.execute(
+                `insert into playlist (playlist_name, playlist_description, imagePath) 
+                 values(?, ?, ?)`, [PlaylistName.trim(), PlaylistDescription?.trim(), default_PL_IMG_Path]
+                );
+        }
+        else{
+            const image = `/PlaylistImage/${req.file.filename}`;
+            await db.execute(
+                `insert into playlist (playlist_name, playlist_description, imagePath)
+                 values (?,?,?)`, [PlaylistName.trim(), PlaylistDescription.trim(), image]
+            );
+        }
+        
 
         return res.status(200).json({message: 'Playlist has been created!'});
     }
