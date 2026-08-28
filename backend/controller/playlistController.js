@@ -1,4 +1,6 @@
 import db from '../db.js';
+import fs from 'fs';
+import path from 'path';
 
 //implement playlist image
 export const createPlaylist = async (req,res) =>{
@@ -25,10 +27,19 @@ export const createPlaylist = async (req,res) =>{
                 );
         }
         else{
-            const image = `/PlaylistImage/${req.file.filename}`;
+            const existingPath = path.join('PlaylistImage', req.file.filename);
+
+            if(fs.existsSync(existingPath)){
+                fs.unlinkSync(req.file.path);
+            }
+            else{
+                fs.renameSync(req.file.path, existingPath);
+            }
+
+            const imagePath = `/PlaylistImage/${req.file.filename}`;
             await db.execute(
                 `insert into playlist (playlist_name, playlist_description, imagePath)
-                 values (?,?,?)`, [PlaylistName.trim(), PlaylistDescription.trim(), image]
+                 values (?,?,?)`, [PlaylistName.trim(), PlaylistDescription?.trim(), imagePath]
             );
         }
         
@@ -128,11 +139,68 @@ export const editPlaylist = async (req,res) =>{
 
 export const loadPlaylist = async(req,res) =>{
     try{
+        const offset = req.params.offset;
+
+        const [result] = await db.execute(`select * from playlist limit 10 offset ?`, [offset]);
         
+        if(result.length === 0){
+            return res.status(403).json({message: 'No more playlist to load!'});
+        }
+
+        return res.status(200).json({message: 'Playlists sent', playlists : result})
     }   
     catch(error){
         console.log(error.message);
 
         return res.status(500).json({message: 'Internal server error!'})
+    }
+}
+
+export const addSongToPlaylist = async(req,res) =>{
+    try{
+        const playlistId = req.params.playlistId;
+        const songId = req.params.songId;
+
+        const [song_check] = await db.execute(`select * from songLib where songID = ?`, [songId]);
+        if(song_check.length === 0){
+            return res.status(400).json({message: 'Song does not exist!'});
+        }
+
+        const [playlist_check] = await db.execute(`select * from playlist where playlist_ID = ?`, [playlistId]);
+        if(playlist_check.length === 0){
+            return res.status(400).json({message: 'Playlist does not exist!'});
+        }
+
+        await db.execute(`insert into playlist_song (playlist_ref, song_ref) values(?,?)`, [playlistId, songId]);
+
+        return res.status(200).json({message: 'song has been added to playlist'});
+    }
+    catch(error){
+        console.log(error.message);
+        return res.status(500).json({message: 'Internal server error!'});
+    }
+}
+
+export const deleteSongFromPlaylist = async(req,res) =>{
+    try{
+        const playlistId = req.params.playlistId;
+        const songId = req.params.songId;
+
+        const [song_check] = await db.execute(`select * from songLib where songID = ?`, [songId]);
+        if(song_check.length === 0){
+            return res.status(400).json({message: 'Song does not exist!'});
+        }
+
+        const [playlist_check] = await db.execute(`select * from playlist where playlist_ID = ?`, [playlistId]);
+        if(playlist_check.length === 0){
+            return res.status(400).json({message: 'Playlist does not exist!'});
+        }
+        
+        await db.execute('delete from playlist_song where playlist_ref = ? and song_ref = ?', [playlistId, songId]);
+
+    }
+    catch(error){
+        console.log(error.message);
+        return res.status(500).json({message: 'Internal server error'});
     }
 }

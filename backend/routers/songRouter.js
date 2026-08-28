@@ -2,9 +2,10 @@ import express from 'express'
 const router = express.Router();
 //file handler
 import multer from 'multer';
-import {UploadSong, deleteSong, editSongName, loadSongs} from '../controller/songController.js'
+import {UploadSong, deleteSong, editSong, loadSongs} from '../controller/songController.js'
 import fs from 'fs';
 import path from 'path';
+import { callbackify } from 'util';
 
 //controls where to store the file 
 const storage = multer.diskStorage({
@@ -44,9 +45,34 @@ const fileFilter = (req, file, callback) =>{
 //create the middleware
 const upload = multer({storage: storage, fileFilter: fileFilter});
 
+
+//image handling for song image 
+const storage_SongImage = multer.diskStorage({
+    destination:  function (req, file, callback){
+        callback(null, 'SongImage/temp/');
+    },
+
+    filename: function (req,file, callback){
+        callback(null, file.originalname);
+    }
+})
+
+const allowed_Mimes_SongImage = ['image/jpeg', 'image/pjpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/tiff', 'image/avif'];
+
+const fileFilter_SongImage = (req,file,callback) =>{
+    if(allowed_Mimes_SongImage.includes(file.mimetype)){
+        callback(null, true)
+    }
+    else{
+        return callback(new Error('Not a valid file type!'))
+    }
+}
+
+const upload2 = multer({storage: storage_SongImage, fileFilter : fileFilter_SongImage});
+
 router.post('/UploadSong', upload.array('files',10), UploadSong);
 router.delete('/deleteSong', deleteSong);
-router.put('/editSongName/:id', editSongName)
+router.put('/editSong/:id', upload2.single('file'), editSong);
 router.get('/loadSongs/:offset', loadSongs);
 
 export default router;

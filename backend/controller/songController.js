@@ -100,22 +100,51 @@ export const deleteSong = async(req,res)=>{
      }
 }
 
-export const editSongName = async(req,res)=>{
-     const songId = req.params.id;
-     const newName = req.body.newName;
-
+export const editSong = async(req,res)=>{
      try{
+          const songId = req.params.id;
+          const {newSongName, newArtistName} = JSON.parse(req.body.newSongInfo);
 
-          const [result] = await db.execute(`UPDATE songLib set songName = ? where songID = ?`, [newName,songId]);
 
-          if(result.affectedRows === 0){
-               return res.status(404).json({message: 'song not found!'})
+          if(!newSongName?.trim() && !newArtistName?.trim() && !req.file){
+               return res.status(400).json({message: 'no change was sent'});
           }
 
-          return res.status(200).json({message: 'song updated!'})
+          const [checkValid] = await db.execute(`select * from songLib where songID = ?`, [songId]);
+          if(checkValid.length === 0){
+               return res.status(400).json({message: 'song does not exist'});
+          }
+
+          const SongName = newSongName?.trim() ? newSongName.trim() : checkValid[0].songName;
+          const ArtistName = newArtistName?.trim() ? newArtistName.trim() : checkValid[0].artistName;
+          let imagePath = checkValid[0].imagePath;
+
+          if(req.file){
+               const existingPath = path.join('SongImage', req.file.filename);
+               const tempPath = req.file.path;
+               if(fs.existsSync(existingPath)){
+                    console.log(`file already exist`)
+                    fs.unlinkSync(tempPath);
+               }
+               else{
+                    console.log('file is new')
+                    fs.renameSync(tempPath, existingPath);
+               }
+
+               imagePath = `/SongImage/${req.file.filename}`;
+          }
+
+          await db.execute(
+                              `UPDATE songLib 
+                               set songName = ?, artistName = ?, imagePath = ? 
+                               where songID = ?`, [SongName, ArtistName, imagePath, songId]
+                              );
+
+          return res.status(200).json({message: 'song updated!'});
+
      }
      catch(error){
-          console.log(error.message);
+          console.log(error);
           return res.status(500).json({message: 'Internal server error!'})
      }
 }

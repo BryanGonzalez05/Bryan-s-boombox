@@ -1,23 +1,17 @@
 import express from 'express';
-import {createPlaylist, deletePlaylist, editPlaylist, loadPlaylist} from '../controller/playlistController.js';
+import {createPlaylist, deletePlaylist, editPlaylist,
+        loadPlaylist, addSongToPlaylist, deleteSongFromPlaylist} from '../controller/playlistController.js';
+        
 const router = express.Router();
 
 import multer from 'multer';
-import fs from 'fs';
-import path from 'path';
 
 const storage = multer.diskStorage({
     destination: function (req, file, callback){
-        callback(null, 'PlaylistImage/');
+        callback(null, 'PlaylistImage/temp');
     },
 
     filename: function (req, file, callback){
-        const filepath = path.join('PlaylistImage', file.originalname);
-
-        if(fs.existsSync(filepath)){
-            return callback(new Error('There already exist a file with the same name!'));
-        }
-
         callback(null, file.originalname);
     }
 
@@ -40,5 +34,7 @@ router.post('/createPlaylist', upload.single('file'), createPlaylist);
 router.delete('/deletePlaylist/:playlistID', deletePlaylist);
 router.put('/editPlaylist/:playlistID', editPlaylist);
 router.get('/loadPlaylist/:offset', loadPlaylist);
+router.get('/:playlistId/song/:songId', addSongToPlaylist);
+router.delete('/:playlistId/song/:songId', deleteSongFromPlaylist)
 
 export default router;
