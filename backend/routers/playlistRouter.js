@@ -32,9 +32,9 @@ const upload = multer({storage : storage, fileFilter : fileFilter});
 
 router.post('/createPlaylist', upload.single('file'), createPlaylist);
 router.delete('/deletePlaylist/:playlistID', deletePlaylist);
-router.put('/editPlaylist/:playlistID', editPlaylist);
+router.put('/editPlaylist/:playlistID', upload.single('file'), editPlaylist);
 router.get('/loadPlaylist/:offset', loadPlaylist);
-router.get('/:playlistId/song/:songId', addSongToPlaylist);
+router.post('/:playlistId/song/:songId', addSongToPlaylist);
 router.delete('/:playlistId/song/:songId', deleteSongFromPlaylist)
 
 export default router;

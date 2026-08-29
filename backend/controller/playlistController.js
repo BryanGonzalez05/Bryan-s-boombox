@@ -2,7 +2,7 @@ import db from '../db.js';
 import fs from 'fs';
 import path from 'path';
 
-//implement playlist image
+
 export const createPlaylist = async (req,res) =>{
     try{
         const {PlaylistName, PlaylistDescription} = JSON.parse(req.body.playlistInfo);
@@ -20,7 +20,7 @@ export const createPlaylist = async (req,res) =>{
 
         
         if(!req.file){
-            const default_PL_IMG_Path = '/PlaylistImage/playlist-img-placeholder.webp';
+            const default_PL_IMG_Path = path.join('PlaylistImage','playlist-img-placeholder.webp');
             await db.execute(
                 `insert into playlist (playlist_name, playlist_description, imagePath) 
                  values(?, ?, ?)`, [PlaylistName.trim(), PlaylistDescription?.trim(), default_PL_IMG_Path]
@@ -36,7 +36,7 @@ export const createPlaylist = async (req,res) =>{
                 fs.renameSync(req.file.path, existingPath);
             }
 
-            const imagePath = `/PlaylistImage/${req.file.filename}`;
+            const imagePath = existingPath;
             await db.execute(
                 `insert into playlist (playlist_name, playlist_description, imagePath)
                  values (?,?,?)`, [PlaylistName.trim(), PlaylistDescription?.trim(), imagePath]
@@ -70,12 +70,13 @@ export const deletePlaylist = async (req,res) =>{
     }
 } 
 
+// do the same like you did for edit song image
 export const editPlaylist = async (req,res) =>{
     const transaction = await db.getConnection();
 
     try{
         const playlist_id = req.params.playlistID;
-        const {playlist_name, playlist_description} = req.body;
+        const {playlist_name, playlist_description} = JSON.parse(req.body.playlistInfo);
         const new_playlist_name = playlist_name?.trim();
         const new_playlist_description = playlist_description?.trim();
 
@@ -86,7 +87,7 @@ export const editPlaylist = async (req,res) =>{
         }
 
 
-        if(!new_playlist_name && !new_playlist_description){
+        if(!new_playlist_name && !new_playlist_description && !req.file){
             return res.status(400).json({message: 'Must include one change!'});
         }
 
@@ -116,20 +117,37 @@ export const editPlaylist = async (req,res) =>{
 
 
 
-        if(checkExistance[0].playlist_description !== new_playlist_description){
+        if(checkExistance[0].playlist_description !== new_playlist_description && new_playlist_description){
             await transaction.execute(`update playlist set playlist_description = ? where playlist_id = ?`, [new_playlist_description, playlist_id]);    
         }
 
+
+        let imagePath = checkExistance[0].imagePath;
+        if(req.file){
+            const existingPath = path.join('PlaylistImage',req.file.filename);
+            const tempPath = req.file.path;
+
+            if(fs.existsSync(existingPath)){
+                console.log('File already exist');
+                fs.unlinkSync(tempPath);
+            }
+            else{
+                console.log('File is new');
+                fs.renameSync(tempPath, existingPath);
+            }
+
+            imagePath = existingPath;
+            await transaction.execute(`update playlist set imagePath = ? where playlist_id = ?`, [imagePath, playlist_id]);
+        }
 
 
         await transaction.commit();
         console.log('transaction was successful');
         return res.status(200).json({message: 'Changes have been commmited!'});
-        
     }
     catch(error){
         await transaction.rollback();
-        console.log(error.message);
+        console.log(error);
         return res.status(500).json({message: 'Internal server error!'});
     }
     finally{

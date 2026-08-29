@@ -6,7 +6,7 @@ import path from 'path';
 export const UploadSong = async(req,res)=>{
    try{
        const files = req.files;
-       const default_IMG_path = '/SongImage/SongImagePlaceHolder.webp';
+       const default_IMG_path = path.join('SongImage', `SongImagePlaceHolder.webp`);
        //checks if are files
        if(!files ||files.length === 0){
             return res.status(400).json({message: 'Error! there are no files inputted'})
@@ -119,6 +119,7 @@ export const editSong = async(req,res)=>{
           const ArtistName = newArtistName?.trim() ? newArtistName.trim() : checkValid[0].artistName;
           let imagePath = checkValid[0].imagePath;
 
+          //if there is a image file sent check if its new or pre-existing
           if(req.file){
                const existingPath = path.join('SongImage', req.file.filename);
                const tempPath = req.file.path;
@@ -131,14 +132,15 @@ export const editSong = async(req,res)=>{
                     fs.renameSync(tempPath, existingPath);
                }
 
-               imagePath = `/SongImage/${req.file.filename}`;
+               imagePath = existingPath;
           }
 
           await db.execute(
-                              `UPDATE songLib 
-                               set songName = ?, artistName = ?, imagePath = ? 
-                               where songID = ?`, [SongName, ArtistName, imagePath, songId]
-                              );
+                         `UPDATE songLib 
+                          set songName = ?, artistName = ?, imagePath = ? 
+                          where songID = ?`, 
+                          [SongName, ArtistName, imagePath, songId]
+                    );
 
           return res.status(200).json({message: 'song updated!'});
 
