@@ -34,6 +34,9 @@ export const UploadSong = async(req,res)=>{
 
             //store info to database
             const metadata = await parseFile(match.path);
+
+            // debug console.log({songname : si.songName, artistName : si.artistName, duration : metadata.format.duration, path : match.path, image: default_IMG_path})
+
             await db.execute(
                  `INSERT INTO songLib (songName, artistName, duration, songPath, imagePath) VALUES(?,?,?,?,?)`,
                  [si.songName, si.artistName, metadata.format.duration, match.path, default_IMG_path]

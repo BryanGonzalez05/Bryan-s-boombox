@@ -23,6 +23,7 @@ const __dirname = path.dirname(__filename);
 //__dirname is the directory path in which the file is in
 app.use('/SongImage', express.static(path.join(__dirname, '..','SongImage')));
 app.use('/PlaylistImage', express.static(path.join(__dirname, '..', 'PlaylistImage')));
+app.use('/Song', express.static(path.join(__dirname,'..' ,'SongFolder')));
 
 
 app.use(`/song`,songRouter);
