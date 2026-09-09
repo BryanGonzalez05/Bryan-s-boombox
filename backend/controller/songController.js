@@ -1,6 +1,7 @@
-import db from '../db.js';
+import db from '../database/db';
 import {parseFile} from 'music-metadata';
 import fs from 'fs';
+import fsp from 'fs/promises';
 import path from 'path';
 
 export const UploadSong = async(req,res)=>{
@@ -37,11 +38,18 @@ export const UploadSong = async(req,res)=>{
 
             // debug console.log({songname : si.songName, artistName : si.artistName, duration : metadata.format.duration, path : match.path, image: default_IMG_path})
 
-            await db.execute(
-                 `INSERT INTO songLib (songName, artistName, duration, songPath, imagePath) VALUES(?,?,?,?,?)`,
-                 [si.songName, si.artistName, metadata.format.duration, match.path, default_IMG_path]
-               );
-          
+          db.prepare(
+               `INSERT INTO songLib
+                (songName, artistName, duration, songPath, imagePath)
+                VALUES(?,?,?,?,?)`
+          ).run(
+               si.songName,
+               si.artistName,
+               metadata.format.duration,
+               match.path,
+               default_IMG_path
+          );
+          console.log('song has been inserted to db \n');
        }
 
        //list file info to see
@@ -68,30 +76,25 @@ export const deleteSong = async(req,res)=>{
           for(const id of songIds){
 
                //searches for them in the db
-               const [row] = await db.execute('select songPath from songLib where songID = ?', [id]);
+               const row =  db.prepare('select songPath from songLib where songID = ?').get(id);
 
                //if nun found continue
-               if(row.length === 0){
+               if(!row){
                     continue;
                }
 
                //gets song path
-               const songPath = row[0].songPath;
+               const songPath = row.songPath;
 
                //waits for deletion of the directory 
-               await fs.unlink(songPath, (err)=>{
-                    if(err){
-                         console.log(err.message);
-                         throw err;
-                    }
-                    else{
-                         console.log(`${songPath} has been deleted from songFolder`);
-                    }
-               })
-
+               await fsp.unlink(songPath);
+               
                //deletes from the db
-               await db.execute(`DELETE from songLib where songID = ?`, [id]);
-
+               db.prepare(
+                    `DELETE from songLib
+                    where songID = ?`
+               ).run(id);
+               
           }
 
           //return message
@@ -103,7 +106,7 @@ export const deleteSong = async(req,res)=>{
      }
 }
 
-export const editSong = async(req,res)=>{
+export const editSong = (req,res)=>{
      try{
           const songId = req.params.id;
           const {newSongName, newArtistName} = JSON.parse(req.body.newSongInfo);
@@ -113,14 +116,14 @@ export const editSong = async(req,res)=>{
                return res.status(400).json({message: 'no change was sent'});
           }
 
-          const [checkValid] = await db.execute(`select * from songLib where songID = ?`, [songId]);
-          if(checkValid.length === 0){
+          const checkValid = db.prepare(`select * from songLib where songID = ?`).get(songId);
+          if(!checkValid){
                return res.status(400).json({message: 'song does not exist'});
           }
 
-          const SongName = newSongName?.trim() ? newSongName.trim() : checkValid[0].songName;
-          const ArtistName = newArtistName?.trim() ? newArtistName.trim() : checkValid[0].artistName;
-          let imagePath = checkValid[0].imagePath;
+          const SongName = newSongName?.trim() ? newSongName.trim() : checkValid.songName;
+          const ArtistName = newArtistName?.trim() ? newArtistName.trim() : checkValid.artistName;
+          let imagePath = checkValid.imagePath;
 
           //if there is a image file sent check if its new or pre-existing
           if(req.file){
@@ -138,12 +141,16 @@ export const editSong = async(req,res)=>{
                imagePath = existingPath;
           }
 
-          await db.execute(
-                         `UPDATE songLib 
-                          set songName = ?, artistName = ?, imagePath = ? 
-                          where songID = ?`, 
-                          [SongName, ArtistName, imagePath, songId]
-                    );
+          db.prepare(
+               `UPDATE songLib 
+               set songName = ?, artistName = ?, imagePath = ? 
+               where songID = ?`, 
+          ).run(
+               SongName,
+               ArtistName, 
+               imagePath, 
+               songId
+          );
 
           return res.status(200).json({message: 'song updated!'});
 
@@ -154,13 +161,15 @@ export const editSong = async(req,res)=>{
      }
 }
 
-export const loadSongs = async (req,res) =>{
+export const loadSongs = (req,res) =>{
     try{
-        const offset = req.params.offset;
+        const offset = Number(req.params.offset);
 
-        const [result] = await db.execute(`
-               select songID, songName, artistName, duration, imagePath 
-               from songLib limit 20 offset ?`, [offset]);
+        const result = db.prepare(`
+                    select songID, songName, artistName, duration, imagePath 
+                    from songLib 
+                    limit 20 offset ?`
+                    ).all(offset);
 
         console.log(result);
 
