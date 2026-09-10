@@ -1,7 +1,9 @@
 import db from '../database/db';
 import fs from 'fs';
+import fsp from 'fs/promises';
 import path from 'path';
 
+//change the database syntax 
 
 export const createPlaylist = async (req,res) =>{
     try{
@@ -12,19 +14,23 @@ export const createPlaylist = async (req,res) =>{
             return res.status(400).json({message: "PlayList name cannot be empty!"});
         }
 
-        const [result] = await db.execute(`select * from playlist where playlist_name = ?`, [PlaylistName.trim()]);
+        const result =  db.prepare(`select * from playlist where playlist_name = ?`).get(PlaylistName.trim());
 
-        if(result.length > 0){
+        if(result){
             return res.status(400).json({message: 'A Playlist already uses this name!'});
         }
 
         
         if(!req.file){
             const default_PL_IMG_Path = path.join('PlaylistImage','playlist-img-placeholder.webp');
-            await db.execute(
+            db.prepare(
                 `insert into playlist (playlist_name, playlist_description, imagePath) 
-                 values(?, ?, ?)`, [PlaylistName.trim(), PlaylistDescription?.trim(), default_PL_IMG_Path]
-                );
+                 values(?, ?, ?)`
+            ).run(
+                PlaylistName.trim(),
+                PlaylistDescription?.trim(),
+                default_PL_IMG_Path
+            );
         }
         else{
             const existingPath = path.join('PlaylistImage', req.file.filename);
@@ -37,9 +43,14 @@ export const createPlaylist = async (req,res) =>{
             }
 
             const imagePath = existingPath;
-            await db.execute(
-                `insert into playlist (playlist_name, playlist_description, imagePath)
-                 values (?,?,?)`, [PlaylistName.trim(), PlaylistDescription?.trim(), imagePath]
+            db.prepare(
+                `insert into playlist
+                 (playlist_name, playlist_description, imagePath)
+                 values (?,?,?)`
+            ).run(    
+                PlaylistName.trim(),
+                PlaylistDescription?.trim(),
+                imagePath
             );
         }
         
@@ -52,13 +63,13 @@ export const createPlaylist = async (req,res) =>{
     }
 }
 
-export const deletePlaylist = async (req,res) =>{
+export const deletePlaylist = (req,res) =>{
     try{
         const playlist_id = req.params.playlistID;
 
-        const [result] = await db.execute('delete from playlist where playlist_id = ?', [playlist_id]);
+        const result =  db.prepare('delete from playlist where playlist_id = ?').run(playlist_id);
 
-        if(result.affectedRows === 0){
+        if(result.changes === 0){
             return res.status(404).json({message: 'Playlist does not exist'});
         }
 
@@ -71,9 +82,7 @@ export const deletePlaylist = async (req,res) =>{
 } 
 
 // do the same like you did for edit song image
-export const editPlaylist = async (req,res) =>{
-    const transaction = await db.getConnection();
-
+export const editPlaylist = (req,res) =>{
     try{
         const playlist_id = req.params.playlistID;
         const {playlist_name, playlist_description} = JSON.parse(req.body.playlistInfo);
@@ -92,13 +101,9 @@ export const editPlaylist = async (req,res) =>{
         }
 
 
-        transaction.beginTransaction();
-
-
         //check if playlist exist
-        const [checkExistance] = await transaction.execute(`select * from playlist where playlist_id = ?`, [playlist_id]);
-        if(checkExistance.length === 0){
-            await transaction.rollback();
+        const checkExistance = db.prepare(`select * from playlist where playlist_id = ?`).get(playlist_id);
+        if(!checkExistance){
             return res.status(404).json({message: 'Playlist does not exist!'});
         }
 
@@ -106,23 +111,43 @@ export const editPlaylist = async (req,res) =>{
         //what to do if there was a name change
         if(new_playlist_name){
             //prevent dups 
-            const [result] = await transaction.execute(`select * from playlist where playlist_name = ? and playlist_id != ?`, [new_playlist_name, playlist_id]);
-            if(result.length !== 0){
-                await transaction.rollback();
+            const result = db.prepare(
+                `select * from playlist
+                 where playlist_name = ? and playlist_id != ?`
+             ).get(
+                new_playlist_name,
+                playlist_id
+            );
+
+            if(!result){
                 return res.status(400).json({message: 'A playlist already has this name!'});
             }
 
-            await transaction.execute(`update playlist set playlist_name = ? where playlist_id = ?`,[new_playlist_name, playlist_id]);
+            db.prepare(
+                `update playlist
+                 set playlist_name = ? 
+                 where playlist_id = ?`
+            ).run(
+                new_playlist_name,
+                playlist_id
+            );
         }
 
 
 
-        if(checkExistance[0].playlist_description !== new_playlist_description && new_playlist_description){
-            await transaction.execute(`update playlist set playlist_description = ? where playlist_id = ?`, [new_playlist_description, playlist_id]);    
+        if(checkExistance.playlist_description !== new_playlist_description){
+            db.prepare(
+                `update playlist
+                 set playlist_description = ?
+                 where playlist_id = ?`
+            ).run(
+                new_playlist_description,
+                playlist_id
+            );    
         }
 
 
-        let imagePath = checkExistance[0].imagePath;
+        let imagePath = checkExistance.imagePath;
         if(req.file){
             const existingPath = path.join('PlaylistImage',req.file.filename);
             const tempPath = req.file.path;
@@ -137,29 +162,31 @@ export const editPlaylist = async (req,res) =>{
             }
 
             imagePath = existingPath;
-            await transaction.execute(`update playlist set imagePath = ? where playlist_id = ?`, [imagePath, playlist_id]);
+            db.prepare(
+                `update playlist
+                 set imagePath = ?
+                 where playlist_id = ?`
+            ).run(
+                 imagePath,
+                 playlist_id
+                );
         }
 
 
-        await transaction.commit();
         console.log('transaction was successful');
         return res.status(200).json({message: 'Changes have been commmited!'});
     }
     catch(error){
-        await transaction.rollback();
         console.log(error);
         return res.status(500).json({message: 'Internal server error!'});
-    }
-    finally{
-        transaction.release();
     }
 }
 
 export const loadPlaylist = async(req,res) =>{
     try{
-        const offset = req.params.offset;
+        const offset = Number(req.params.offset);
 
-        const [result] = await db.execute(`select * from playlist limit 10 offset ?`, [offset]);
+        const result = db.prepare(`select * from playlist limit 10 offset ?`).all(offset);
         
         if(result.length === 0){
             return res.status(403).json({message: 'No more playlist to load!'});
@@ -179,17 +206,19 @@ export const addSongToPlaylist = async(req,res) =>{
         const playlistId = req.params.playlistId;
         const songId = req.params.songId;
 
-        const [song_check] = await db.execute(`select * from songLib where songID = ?`, [songId]);
-        if(song_check.length === 0){
+        const song_check = db.prepare(`select * from songLib where songID = ?`).get(songId);
+        if(!song_check){
             return res.status(400).json({message: 'Song does not exist!'});
         }
 
-        const [playlist_check] = await db.execute(`select * from playlist where playlist_ID = ?`, [playlistId]);
-        if(playlist_check.length === 0){
+
+        const playlist_check = db.prepare(`select * from playlist where playlist_ID = ?`).get(playlistId);
+        if(!playlist_check){
             return res.status(400).json({message: 'Playlist does not exist!'});
         }
 
-        await db.execute(`insert into playlist_song (playlist_ref, song_ref) values(?,?)`, [playlistId, songId]);
+
+        db.prepare(`insert into playlist_song (playlist_ref, song_ref) values(?,?)`).run(playlistId, songId);
 
         return res.status(200).json({message: 'song has been added to playlist'});
     }
@@ -204,17 +233,19 @@ export const deleteSongFromPlaylist = async(req,res) =>{
         const playlistId = req.params.playlistId;
         const songId = req.params.songId;
 
-        const [song_check] = await db.execute(`select * from songLib where songID = ?`, [songId]);
-        if(song_check.length === 0){
+        const song_check =  db.prepare(`select * from songLib where songID = ?`).get(songId);
+        if(!song_check){
             return res.status(400).json({message: 'Song does not exist!'});
         }
 
-        const [playlist_check] = await db.execute(`select * from playlist where playlist_ID = ?`, [playlistId]);
-        if(playlist_check.length === 0){
+
+        const playlist_check = db.prepare(`select * from playlist where playlist_ID = ?`).get(playlistId);
+        if(!playlist_check){
             return res.status(400).json({message: 'Playlist does not exist!'});
         }
         
-        await db.execute('delete from playlist_song where playlist_ref = ? and song_ref = ?', [playlistId, songId]);
+
+        db.prepare('delete from playlist_song where playlist_ref = ? and song_ref = ?').run(playlistId, songId);
 
     }
     catch(error){

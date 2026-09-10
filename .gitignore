@@ -2,4 +2,5 @@ node_modules/
 SongFolder/
 SongImage/
 PlaylistImage/
+database/testDB.db
 .env
