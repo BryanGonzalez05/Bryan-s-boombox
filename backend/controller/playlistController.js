@@ -1,4 +1,4 @@
-import db from '../database/db';
+import db from '../database/db.js';
 import fs from 'fs';
 import fsp from 'fs/promises';
 import path from 'path';

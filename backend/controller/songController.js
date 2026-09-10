@@ -1,4 +1,4 @@
-import db from '../database/db';
+import db from '../database/db.js';
 import {parseFile} from 'music-metadata';
 import fs from 'fs';
 import fsp from 'fs/promises';
@@ -31,7 +31,7 @@ export const UploadSong = async(req,res)=>{
             }
 
             //list info to see
-            console.log(`filename : ${match.originalname}\n artist name: ${si.artistName}\n filepath: ${match.path}`)
+            //console.log(`filename : ${match.originalname}\n artist name: ${si.artistName}\n filepath: ${match.path}`)
 
             //store info to database
             const metadata = await parseFile(match.path);
@@ -53,9 +53,9 @@ export const UploadSong = async(req,res)=>{
        }
 
        //list file info to see
-       files.forEach(file => {
+       /*files.forEach(file => {
             console.log(file);
-       });
+       }); */
 
        return res.status(200).json({message: "Success"})
    }
@@ -171,7 +171,6 @@ export const loadSongs = (req,res) =>{
                     limit 20 offset ?`
                     ).all(offset);
 
-        console.log(result);
 
         if(result.length === 0){
             return res.status(400).json({message : 'No more songs to load!'});
