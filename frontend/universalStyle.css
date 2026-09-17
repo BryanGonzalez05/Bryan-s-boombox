@@ -39,7 +39,7 @@ body{
 }
 
 #songPageBTN.active{
-    background-color: white !important;
+    background-color: rgb(146, 215, 215) !important;
     border: 5px solid black !important;
 }
 
@@ -67,8 +67,39 @@ body{
 
 #search-bar{
     width: 100%;
-    height: 50px;
+    height: 40px;
     font-size: 25px;
     text-align: center;
     margin-inline: 10px;
 }
+
+#searchBTN{
+    border: none;
+    background-color: rgb(40, 158, 255);
+    color:white;
+    margin-right: 10px;
+    padding-inline: 10px;
+    padding-block: 5px;
+    border-radius: 10%;
+}
+
+#searchBTN:hover{
+    background-color: rgb(77, 175, 255);
+}
+
+.optionBTN{
+    width: fit-content;
+    height: fit-content;
+    border: none;
+    background-color: inherit;
+    font-size: large;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+}
+
+.optionBTN:hover{
+    background-color: rgb(199, 199, 199);
+}
+
+

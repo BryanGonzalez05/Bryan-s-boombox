@@ -1,15 +1,30 @@
 .song-div{
     display: flex;
     width: 100%;
-    height: 150px;
+    height: 200px;
     background-color: aliceblue;
     justify-content: space-between;
 }
 
 .song-div .left{
     display: flex;
-    background-color: aqua;
+    width: fit-content;
+    align-items: center;
 }
+
+.song-div img{
+    width:200px;
+    background-color: brown;
+    height: 100%;
+    display: flex;
+}
+
+.songInfo{
+    height: 100%;
+    margin-left: 5px;
+    font-size: 20px; 
+}
+
 
 .song-div .right{
     display: flex;
