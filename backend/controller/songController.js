@@ -7,7 +7,7 @@ import path from 'path';
 export const UploadSong = async(req,res)=>{
    try{
        const files = req.files;
-       const default_IMG_path = path.join('SongImage', `SongImagePlaceHolder.webp`);
+       const default_IMG_path = path.join('SongImage', `song-place-holder.webp`);
        //checks if are files
        if(!files ||files.length === 0){
             return res.status(400).json({message: 'Error! there are no files inputted'})

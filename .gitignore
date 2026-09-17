@@ -1,6 +1,7 @@
 node_modules/
-SongFolder/
-SongImage/
-PlaylistImage/
+SongFolder/*
+SongImage/*
+!SongImage/song-place-holder.webp
+PlaylistImage/*
+!PlaylistImage/playlist-img-placeholder.webp
 database/testDB.db
-.env
