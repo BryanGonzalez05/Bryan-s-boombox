@@ -4,4 +4,4 @@ SongImage/*
 !SongImage/song-place-holder.webp
 PlaylistImage/*
 !PlaylistImage/playlist-img-placeholder.webp
-database/testDB.db
+backend/database/testDB.db
