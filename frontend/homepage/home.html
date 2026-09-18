@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link rel="stylesheet" href="../universalStyle.css">
+</head>
+<body>
+    <header>
+        <div id="header">
+            <button id="songPageBTN" class="active">Songs</button>
+            <button id="playlistPageBTN">Playlists</button>
+        </div>
+
+        <form id="search-div">
+            <input type="search" placeholder="Search song from library" id="search-bar">
+            <button type="submit" id="searchBTN">search</button>
+        </form>
+    </header>
+    
+    
+    <div id="songLib-body">
+
+        <div class="song-div">
+            <div class="left">
+                <img alt="song image">
+                <div class="songInfo">
+                    <p>Flashing lights</p>
+                    <p>kanye west</p>
+                </div>
+            </div>
+            <div class="right">
+                <button class="optionBTN">...</button>
+                <p>1:20</p>
+            </div>
+        </div>
+
+        <div class="song-div">
+            <div class="left">
+                <img alt="song image">
+                <div class="songInfo">
+                    <p>punch drunk</p>
+                    <p>kanye west</p>
+                </div>
+            </div>
+            <div class="right">
+                <button class="optionBTN">...</button>
+                <p>1:20</p>
+            </div>
+        </div>
+
+        <div class="song-div">
+            <div class="left">
+                <img alt="song image">
+                <div class="songInfo">
+                    <p>punch drunk</p>
+                    <p>kanye west</p>
+                </div>
+            </div>
+            <div class="right">
+                <button class="optionBTN">...</button>
+                <p>1:20</p>
+            </div>
+        </div>
+        
+    </div>
+
+    <div id="playlistLib-body" class="hidden">
+        <div class="playlist-container">
+            <div class="left">
+                <img alt="playlist-img">
+                <div class="playlist-info">
+                    <p class="playlist-name">playlist name</p>
+                    <p class="playlist-description">playlist description</p>
+                </div>
+            </div>
+
+            <div class="right"> 
+                <button class="optionBTN">...</button>
+                <p class="track-count">tracks: 100</p>
+                <p class="playlist-duration">12 hours 25 minutes</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="homepageScript.js"></script>
+</body>
+</html>
