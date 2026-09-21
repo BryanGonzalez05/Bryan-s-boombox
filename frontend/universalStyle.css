@@ -15,7 +15,7 @@ body{
     position: sticky;
 }
 
-#header #songPageBTN{
+#header #songPageBTN, #header #playlistPageBTN, #header #activationBTN{
     border: none;
     width: 100%;
     height: inherit;
@@ -25,14 +25,9 @@ body{
     font-weight: bold;
 }
 
- #header #playlistPageBTN{
-    border: none;
-    width: 100%;
-    height: inherit;
-    font-family: 'Courier New', Courier, monospace;
-    background-color: rgb(172, 254, 254);
-    font-size: x-large;
-    font-weight: bold;
+
+#body{
+    position: relative;
 }
 
 #songPageBTN:hover{
@@ -51,6 +46,10 @@ body{
 #playlistPageBTN.active{
     background-color: rgb(146, 215, 215) !important;
     border: 5px solid black !important;
+}
+
+#activationBTN:hover{
+    background-color: rgb(192, 254, 254) !important;
 }
 
 #playlistLib-body, #songLib-body{
@@ -191,4 +190,16 @@ body{
     margin-top: 10px;
     text-align: right;
     margin-right: 10px;
+}
+
+.closeBTN{
+    border: none;
+    background-color: rgb(40, 158, 255);
+    color: white;
+    padding: 5px 10px 5px 10px;
+    border-radius: 10px;
+}
+
+.closeBTN:hover{
+    background-color: rgb(77, 175, 255);
 }

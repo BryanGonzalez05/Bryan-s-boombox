@@ -6,35 +6,21 @@ import path from 'path';
 
 export const UploadSong = async(req,res)=>{
    try{
-       const files = req.files;
+       const file = req.file;
        const default_IMG_path = path.join('SongImage', `song-place-holder.webp`);
-       //checks if are files
-       if(!files ||files.length === 0){
+       //checks if are file
+       if(!file){
             return res.status(400).json({message: 'Error! there are no files inputted'})
        }
-
+       
        //gets extra info from frontend
        //you cant send json so backend because of middleware 
-       //it expects audio files with fieldname: files
+       //it expects audio files with fieldname: file
        //so send json as a string and its parse here. 
        const songInfo = JSON.parse(req.body.songInfo);
 
-       //iterates through json
-       for(const si of songInfo){ 
-            //finds a match 
-            const match = files.find(f =>{
-                 return f.originalname === si.fileName;
-            })
-
-            if(!match){
-                 return res.status(400).json({message: `Error! file name ${si.fileName} does not match as listed`})
-            }
-
-            //list info to see
-            //console.log(`filename : ${match.originalname}\n artist name: ${si.artistName}\n filepath: ${match.path}`)
-
             //store info to database
-            const metadata = await parseFile(match.path);
+            const metadata = await parseFile(file.path);
 
             // debug console.log({songname : si.songName, artistName : si.artistName, duration : metadata.format.duration, path : match.path, image: default_IMG_path})
 
@@ -43,19 +29,14 @@ export const UploadSong = async(req,res)=>{
                 (songName, artistName, duration, songPath, imagePath)
                 VALUES(?,?,?,?,?)`
           ).run(
-               si.songName,
-               si.artistName,
+               songInfo.songName,
+               songInfo.artistName,
                metadata.format.duration,
-               match.path,
+               file.path,
                default_IMG_path
           );
           console.log('song has been inserted to db \n');
-       }
 
-       //list file info to see
-       /*files.forEach(file => {
-            console.log(file);
-       }); */
 
        return res.status(200).json({message: "Success"})
    }

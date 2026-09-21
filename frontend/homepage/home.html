@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <title>Home</title>
     <link rel="stylesheet" href="../universalStyle.css">
+    <link rel="stylesheet" href="./song-form.css">
 </head>
 <body>
     <header>
         <div id="header">
             <button id="songPageBTN" class="active">Songs</button>
             <button id="playlistPageBTN">Playlists</button>
+            <button id="activationBTN">Add song</button>
         </div>
 
         <form id="search-div">
@@ -80,6 +82,39 @@
                 <p class="track-count">tracks: 100</p>
                 <p class="playlist-duration">12 hours 25 minutes</p>
             </div>
+        </div>
+    </div>
+
+
+    <div id="add-song-container" class="hidden">
+        
+        <div id="add-song-div">
+            <div class="header-container">
+                <div></div>
+                <div>
+                    <p>Add Song</p>
+                </div>
+                <div>
+                    <button class="closeBTN">x</button>
+                </div>
+            </div>
+
+            <form id="song-form">
+
+                <p>Select Audio File</p>
+                <input type="file" id="selected-file" accept="audio/mpeg">
+
+                <p>Song Name</p>
+                <input type="text" id="song-name" placeholder="song name">
+
+                <p>Artiest Name</p>
+                <input type="text" id="artiest-name" placeholder="artiest name">
+                
+                <div style="display: flex; justify-content: center; width: 100%;">
+                     <button id="submit-song-form" type="submit">Submit</button>
+                </div>
+               
+            </form>
         </div>
     </div>
 

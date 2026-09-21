@@ -70,7 +70,7 @@ const fileFilter_SongImage = (req,file,callback) =>{
 
 const upload2 = multer({storage: storage_SongImage, fileFilter : fileFilter_SongImage});
 
-router.post('/UploadSong', upload.array('files',10), UploadSong);
+router.post('/UploadSong', upload.single('file'), UploadSong);
 router.delete('/deleteSong', deleteSong);
 router.put('/editSong/:id', upload2.single('file'), editSong);
 router.get('/loadSongs/:offset', loadSongs);
