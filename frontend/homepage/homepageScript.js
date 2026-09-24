@@ -37,26 +37,27 @@ activationBTN.addEventListener('click', ()=>{
 /* close add-song-container */
 const selected_file = document.getElementById('selected-file');
 const song_name = document.getElementById('song-name');
-const artiest_name = document.getElementById('artiest-name');
+const artist_name = document.getElementById('artist-name');
 
 close_song_container_btn.addEventListener('click', ()=>{
     add_song_container.classList.add('hidden');
     document.body.style.overflow = '';
     selected_file.value = '';
     song_name.value = '';
-    artiest_name.value = '';
+    artist_name.value = '';
 })
 
 
 /* submit song to backend */
-const submit_song_form = document.getElementById('submit-song-form');
-submit_song_form.addEventListener('submit', async()=>{
+const submit_song_form = document.getElementById('song-form');
+submit_song_form.addEventListener('submit', async(event)=>{
+    event.preventDefault();
     try{
         const form_data = new FormData();
 
         const songInfo = {
             songName: song_name.value,
-            artistName: artiest_name.value
+            artistName: artist_name.value
         }
 
         form_data.append('file', selected_file.files[0]);
@@ -68,8 +69,16 @@ submit_song_form.addEventListener('submit', async()=>{
         })
 
         const data = await response.json();
-        
-        console.log(data.message)
+        if(response.ok){
+            console.log('song has been added to library');
+            selected_file.value = '';
+            song_name.value = '';
+            artist_name.value = '';
+        }
+        else{
+            console.log(data.message);
+        }
+
     }
     catch(error){
         console.log(error);

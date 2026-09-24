@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Home</title>
     <link rel="stylesheet" href="../universalStyle.css">
-    <link rel="stylesheet" href="./song-form.css">
+    <link rel="stylesheet" href="./homepage/song-form.css">
 </head>
 <body>
     <header>
@@ -102,13 +102,13 @@
             <form id="song-form">
 
                 <p>Select Audio File</p>
-                <input type="file" id="selected-file" accept="audio/mpeg">
+                <input type="file" id="selected-file" accept="audio/mpeg,audio/ogg,audio/wav">
 
                 <p>Song Name</p>
                 <input type="text" id="song-name" placeholder="song name">
 
-                <p>Artiest Name</p>
-                <input type="text" id="artiest-name" placeholder="artiest name">
+                <p>Artist Name</p>
+                <input type="text" id="artist-name" placeholder="artist name">
                 
                 <div style="display: flex; justify-content: center; width: 100%;">
                      <button id="submit-song-form" type="submit">Submit</button>
@@ -118,6 +118,6 @@
         </div>
     </div>
 
-    <script src="homepageScript.js"></script>
+    <script src="./homepage/homepageScript.js"></script>
 </body>
 </html>

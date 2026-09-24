@@ -17,6 +17,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+import fs from 'fs';
+fs.mkdir(path.join(__dirname, '..', ))
+
 
 //express.static is for handling static files like img, js , css etc
 //path joins the set varibles into a directory string
@@ -25,6 +28,15 @@ app.use('/SongImage', express.static(path.join(__dirname, '..','SongImage')));
 app.use('/PlaylistImage', express.static(path.join(__dirname, '..', 'PlaylistImage')));
 app.use('/Song', express.static(path.join(__dirname,'..' ,'SongFolder')));
 
+
+//serve the html files
+app.use(express.static(path.join(__dirname, '..' ,'frontend')));
+
+
+
+app.get('/', (req,res) =>{
+    res.sendFile(path.join(__dirname, '..' ,'frontend', 'homepage', 'home.html'))
+})
 
 app.use(`/song`,songRouter);
 app.use('/playlist', playlistRouter)
