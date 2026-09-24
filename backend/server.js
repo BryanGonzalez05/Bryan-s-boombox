@@ -17,6 +17,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+//creates any missing directories that are missing or user deletes
 import fsp from 'fs/promises';
 await fsp.mkdir(path.join(__dirname, '..', 'SongFolder' ), {recursive: true});
 
@@ -27,6 +28,7 @@ await fsp.mkdir(path.join(__dirname, '..', 'PlaylistImage'), {recursive: true});
 await fsp.mkdir(path.join(__dirname, '..', 'PlaylistImage', 'temp'), {recursive: true});
 
 await fsp.mkdir(path.join(__dirname, '..', 'SongImage', 'temp'), {recursive: true});
+
 
 //express.static is for handling static files like img, js , css etc
 //path joins the set varibles into a directory string
