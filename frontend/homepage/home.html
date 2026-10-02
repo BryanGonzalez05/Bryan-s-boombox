@@ -65,6 +65,9 @@
             </div>
         </div>
         
+        <div id="song-library-anchor">
+            <p id="song-libray-anchor-message">test</p>
+        </div>
     </div>
 
     <div id="playlistLib-body" class="hidden">
@@ -110,8 +113,9 @@
                 <p>Artist Name</p>
                 <input type="text" id="artist-name" placeholder="artist name">
                 
-                <div style="display: flex; justify-content: center; width: 100%;">
-                     <button id="submit-song-form" type="submit">Submit</button>
+                <div style="display: flex; flex-direction: column; justify-content: center; width: 100%;">
+                    <p id="song-added-status" class="">Song has been added to library!</p>
+                    <button id="submit-song-form" type="submit">Submit</button>
                 </div>
                
             </form>

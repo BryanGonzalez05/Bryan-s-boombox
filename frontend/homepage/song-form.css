@@ -53,3 +53,15 @@
 #submit-song-form:hover{
     background-color: rgb(77, 175, 255);
 }
+
+#song-added-status .hidden{
+    display: none;
+}
+
+#song-library-anchor{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    
+}

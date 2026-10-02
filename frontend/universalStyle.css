@@ -115,7 +115,10 @@ body{
     background-color: aliceblue;
     justify-content: space-between;
     border-bottom: 1px gray solid;
+    position: relative;
+    cursor: pointer;
 }
+
 
 .song-div .left{
     display: flex;
@@ -203,3 +206,4 @@ body{
 .closeBTN:hover{
     background-color: rgb(77, 175, 255);
 }
+

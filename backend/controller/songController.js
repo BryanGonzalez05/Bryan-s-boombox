@@ -35,10 +35,19 @@ export const UploadSong = async(req,res)=>{
                file.path,
                default_IMG_path
           );
+
+          const newSong = {
+               songName : songInfo.songName,
+               artistName : songInfo.artistName,
+               duration : metadata.format.duration,
+               songPath : file.path,
+               imagePath : default_IMG_path
+          }
+
           console.log('song has been inserted to db \n');
 
 
-       return res.status(200).json({message: "Success"})
+       return res.status(200).json({message: "Success", newSong : newSong})
    }
    catch(error){
      console.log(error);
@@ -147,14 +156,14 @@ export const loadSongs = (req,res) =>{
         const offset = Number(req.params.offset);
 
         const result = db.prepare(`
-                    select songID, songName, artistName, duration, imagePath 
+                    select songID, songName, artistName, duration, imagePath, songPath 
                     from songLib 
-                    limit 20 offset ?`
+                    limit 100 offset ?`
                     ).all(offset);
 
 
         if(result.length === 0){
-            return res.status(400).json({message : 'No more songs to load!'});
+            return res.status(404).json({message : 'No more songs to load!'});
         }
 
         
