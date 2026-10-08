@@ -207,3 +207,39 @@ body{
     background-color: rgb(77, 175, 255);
 }
 
+
+
+/* missing container style*/
+
+#Missing-container{
+    width: 100%;
+    height: 100%;
+    background-color: rgba(159, 159, 159, 0.311);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+#Missing-form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    padding: 5%;
+    gap: 15px;
+}
+
+#missing-wrapper{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+ #missing-songImage,  #missing-playlistImage{
+    flex: 1;
+    flex-direction: column;
+    text-align: left;
+}

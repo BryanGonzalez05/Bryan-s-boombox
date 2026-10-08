@@ -14,7 +14,7 @@ export function imageCheck (req, res, next){
 
     if(songImageMissing || !playlistImageMissing){
         return res.status(503).json({
-            error : "Missing important data!",
+            error : "Missinng Images",
             songImageMissing : songImageMissing,
             playlistImageMissing : playlistImageMissing,
         });
