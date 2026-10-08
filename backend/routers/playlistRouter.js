@@ -1,6 +1,7 @@
 import express from 'express';
 import {createPlaylist, deletePlaylist, editPlaylist,
         loadPlaylist, addSongToPlaylist, deleteSongFromPlaylist} from '../controller/playlistController.js';
+import { imageCheck } from '../middleware/ImageCheck.js';
         
 const router = express.Router();
 
@@ -33,8 +34,10 @@ const upload = multer({storage : storage, fileFilter : fileFilter});
 router.post('/createPlaylist', upload.single('file'), createPlaylist);
 router.delete('/deletePlaylist/:playlistID', deletePlaylist);
 router.put('/editPlaylist/:playlistID', upload.single('file'), editPlaylist);
-router.get('/loadPlaylist/:offset', loadPlaylist);
+router.get('/loadPlaylist/:offset', imageCheck, loadPlaylist);
 router.post('/:playlistId/song/:songId', addSongToPlaylist);
 router.delete('/:playlistId/song/:songId', deleteSongFromPlaylist)
+//create a router that PUTS a new default image
+
 
 export default router;
