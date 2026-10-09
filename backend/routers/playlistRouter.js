@@ -1,15 +1,23 @@
 import express from 'express';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+
 import {createPlaylist, deletePlaylist, editPlaylist,
         loadPlaylist, addSongToPlaylist, deleteSongFromPlaylist} from '../controller/playlistController.js';
 import { imageCheck } from '../middleware/ImageCheck.js';
-        
+
+
 const router = express.Router();
 
-import multer from 'multer';
 
+import multer from 'multer';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const playlistImagepath = path.join(__dirname, '..', '..', 'PlaylistImage', 'temp')
 const storage = multer.diskStorage({
     destination: function (req, file, callback){
-        callback(null, 'PlaylistImage/temp');
+        callback(null, playlistImagepath);
     },
 
     filename: function (req, file, callback){

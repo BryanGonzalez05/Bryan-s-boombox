@@ -9,40 +9,128 @@ const songMap = new Map();
 const song_library_anchor = document.getElementById('song-library-anchor');
 let isloading = false;
 
+const MissingContainer = document.getElementById('Missing-container');
+
 const observer = new IntersectionObserver(async(entries) =>{
     if(entries[0].isIntersecting && !isloading){
 
         isloading = true;
+        
+        try{
 
-        if(currentPage === 'song'){
-            const response = await load_songs_to_library(song_offset);
-            
-            if(response.success){
-                response.songs.forEach(song=>{
-                    console.log(song);
-                    songMap.set(song.songID,{   
-                            songID : song.songID,
-                            songName : song.songName,
-                            artistName : song.artistName,
-                            duration : song.duration,
-                            imagePath : song.imagePath,
-                            songPath : song.songPath
-                        })
+            if(currentPage === 'song'){
+                const response = await load_songs_to_library(song_offset);
+                
+                if(response.success){
+                    response.songs.forEach(song=>{
+                        console.log(song);
+                        songMap.set(song.songID,{   
+                                songID : song.songID,
+                                songName : song.songName,
+                                artistName : song.artistName,
+                                duration : song.duration,
+                                imagePath : song.imagePath,
+                                songPath : song.songPath
+                            })
 
-                    add_new_song_div(song);
-                })
+                        add_new_song_div(song);
+                    })
 
-                console.log(songMap);
-                song_offset += 100;
-            }
-            else {
-                song_library_anchor.classList.add(hidden);
+                    console.log(songMap);
+                    song_offset += 100;
+                }
+                else if(response.status === 503){
+                    console.log('error here');
+                    document.body.style.overflow = 'hidden';
+                    MissingContainer.classList.remove('hidden');
+                    song_library_anchor.classList.add('hidden');
+                    MissingImages(response);
+                }
+                else {
+                    song_library_anchor.classList.add('hidden');
+                }
             }
         }
-
-        isloading = false;
+        catch(error){
+            console.log(error);
+        }
+        finally{
+            isloading = false;
+        }
+        
     }
 }, {rootMargin : '200px'})
+
+
+
+//load song function
+const songLib_body = document.getElementById('songLib-body');
+async function load_songs_to_library (o){
+    const url = `http://localhost:5000/song/loadSongs/${o}`;
+
+    try{
+        const response = await fetch(url,{
+            method : 'GET',
+            headers : {
+                'Content-Type' : 'application/json'
+            }
+        })
+
+        const data = await response.json();
+        if(response.ok){
+            return {success : true, songs: data.songs, message : data.message};
+        }
+        if(response.status === 503){
+            return {
+                success : false, message : data.message,
+                status: response.status,
+                MissingSongImg : data.songImageMissing,
+                MissingPlaylistImg : data.playlistImageMissing}
+        }
+        else{
+            return {success : false, message : data.message};
+        }
+    }
+    catch(err){
+        console.error(err);
+        return {success : false, message : 'Error! server failed'};
+    }
+
+}
+
+
+
+/* Missing import images function */
+const missingSongImageDiv = document.getElementById('missing-songImage');
+const missingPlaylistImageDiv = document.getElementById('missing-playlistImage');
+
+function MissingImages(response){
+    //fetches two booleans 
+    const missingSongImage = response.MissingSongImage;
+    const missingPlaylistImage = response.MissingPlaylistImage;
+
+    
+    if(missingPlaylistImage){
+        missingPlaylistImageDiv.classList.remove('hidden');
+    }
+    if(missingSongImage){
+        missingSongImageDiv.classList.remove('hidden');
+    }
+}
+
+
+const MissingformDiv = document.getElementById('Missing-form');
+
+MissingformDiv.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const formData = new FormData(MissingformDiv);
+
+    /*create the function and use a multer feild of upload.fields([
+    { name: 'songImage', maxCount: 1 },
+    { name: 'playlistImage', maxCount: 1 }
+    ])*/
+})
+
 
 
 //create the new song elements to song body
@@ -86,38 +174,6 @@ else{
     currentPage = 'playlist'
 }
 
-
-
-
-
-
-//load song function
-const songLib_body = document.getElementById('songLib-body');
-async function load_songs_to_library (o){
-    const url = `http://localhost:5000/song/loadSongs/${o}`;
-
-    try{
-        const response = await fetch(url,{
-            method : 'GET',
-            headers : {
-                'Content-Type' : 'application/json'
-            }
-        })
-
-        const data = await response.json();
-        if(response.ok){
-            return {success : true, songs: data.songs, message : data.message};
-        }
-        else{
-            return {success : false, message : data.message};
-        }
-    }
-    catch(err){
-        console.error(err);
-        return {success : false, message : 'Error! server failed'};
-    }
-
-}
 
 
 
@@ -213,5 +269,7 @@ submit_song_form.addEventListener('submit', async(event)=>{
         console.log(error);
     }
 })
+
+
 
 

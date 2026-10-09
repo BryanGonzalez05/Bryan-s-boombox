@@ -238,8 +238,13 @@ body{
     flex-direction: column;
     width: 100%;
 }
- #missing-songImage,  #missing-playlistImage{
+#missing-songImage,  #missing-playlistImage{
     flex: 1;
     flex-direction: column;
     text-align: left;
 }
+
+#Missing-container .hidden{
+    display: none !important;
+}
+
