@@ -3,6 +3,7 @@ const app = express();
 //router path
 import songRouter from './routers/songRouter.js';
 import playlistRouter from './routers/playlistRouter.js';
+import extraFunc from './routers/extraFuncRouter.js';
 
 
 //used to set incoming json to parse
@@ -48,7 +49,8 @@ app.get('/', (req,res) =>{
 })
 
 app.use(`/song`,songRouter);
-app.use('/playlist', playlistRouter)
+app.use('/playlist', playlistRouter);
+app.use('/', extraFunc);
 
 //future ref create a backup function
 

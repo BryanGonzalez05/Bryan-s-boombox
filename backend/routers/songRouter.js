@@ -5,21 +5,27 @@ import multer from 'multer';
 import {UploadSong, deleteSong, editSong, loadSongs} from '../controller/songController.js'
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
 //check for default images 
 import { imageCheck } from '../middleware/ImageCheck.js'; 
 
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const songDirPath = path.join(__dirname, '..', '..', 'SongFolder')
 //controls where to store the file 
 const storage = multer.diskStorage({
     //sets the destination of where to store the file
     destination: function(req, file, callback){
-        callback(null, 'SongFolder/')
+        callback(null, songDirPath);
     },
     //sets the name of the file to the original name
     //if not given a name, a random name will be given
     filename: function (req, file, callback){
 
         //fetch a file with the original name
-        const filepath = path.join('SongFolder/', file.originalname);
+        const filepath = path.join(songDirPath, file.originalname);
 
         //checks if there is a file with the same name
         if(fs.existsSync(filepath)){
@@ -46,9 +52,10 @@ const upload = multer({storage: storage, fileFilter: fileFilter});
 
 
 //image handling for song image 
+const songImageDir = path.join(__dirname, '..', '..', 'SongImage', 'temp');
 const storage_SongImage = multer.diskStorage({
     destination:  function (req, file, callback){
-        callback(null, 'SongImage/temp/');
+        callback(null, songImageDir);
     },
 
     filename: function (req,file, callback){

@@ -12,6 +12,7 @@ export function imageCheck (req, res, next){
     const songImageMissing = !fs.existsSync(defaultSongImagePath);
     const playlistImageMissing = !fs.existsSync(defaultPlaylistImagePath);
 
+
     if(songImageMissing || playlistImageMissing){
         return res.status(503).json({
             error : "Missinng Images",

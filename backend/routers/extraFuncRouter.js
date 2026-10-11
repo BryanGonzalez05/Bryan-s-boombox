@@ -5,7 +5,7 @@ import path from 'path';
 import { newDefaultImg } from '../controller/extraFuncController.js';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.join(__filename);
+const __dirname = path.dirname(__filename);
 const PlaylistImageDir = path.join(__dirname, '..', '..', 'PlaylistImage', 'temp');
 const songImageDir = path.join(__dirname, '..', '..', 'SongImage', 'temp');
 
@@ -47,3 +47,5 @@ router.post('/restoreDefaultImgs', upload.fields([
     ]),
     newDefaultImg
 )
+
+export default router;

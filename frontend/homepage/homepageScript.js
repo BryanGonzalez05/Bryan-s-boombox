@@ -23,7 +23,6 @@ const observer = new IntersectionObserver(async(entries) =>{
                 
                 if(response.success){
                     response.songs.forEach(song=>{
-                        console.log(song);
                         songMap.set(song.songID,{   
                                 songID : song.songID,
                                 songName : song.songName,
@@ -59,7 +58,7 @@ const observer = new IntersectionObserver(async(entries) =>{
         }
         
     }
-}, {rootMargin : '200px'})
+}, {rootMargin : '100px'})
 
 
 
@@ -84,8 +83,8 @@ async function load_songs_to_library (o){
             return {
                 success : false, message : data.message,
                 status: response.status,
-                MissingSongImg : data.songImageMissing,
-                MissingPlaylistImg : data.playlistImageMissing}
+                MissingSongImage : data.songImageMissing,
+                MissingPlaylistImage : data.playlistImageMissing}
         }
         else{
             return {success : false, message : data.message};
@@ -109,7 +108,6 @@ function MissingImages(response){
     const missingSongImage = response.MissingSongImage;
     const missingPlaylistImage = response.MissingPlaylistImage;
 
-    
     if(missingPlaylistImage){
         missingPlaylistImageDiv.classList.remove('hidden');
     }
@@ -120,15 +118,33 @@ function MissingImages(response){
 
 
 const MissingformDiv = document.getElementById('Missing-form');
-
-MissingformDiv.addEventListener('submit', (e)=>{
+const SongImagefile = document.getElementById('SongImagefile');
+const PlaylistImagefile = document.getElementById('PlaylistImagefile');
+MissingformDiv.addEventListener('submit', async (e)=>{
     e.preventDefault();
     const formData = new FormData(MissingformDiv);
 
-    /*create the function and use a multer feild of upload.fields([
-    { name: 'songImage', maxCount: 1 },
-    { name: 'playlistImage', maxCount: 1 }
-    ])*/
+    const url = 'http://localhost:5000/restoreDefaultImgs'
+
+    try{
+        const response = await fetch(url,{
+            method: 'POST',
+            body: formData
+        }) 
+
+        const data = await response.json()
+        if(response.ok){
+            console.log(data.message);
+            document.body.style.overflow = '';
+            missingSongImageDiv.classList.add('hidden');
+            missingPlaylistImageDiv.classList.add('hidden');
+            MissingContainer.classList.add('hidden');
+            song_library_anchor.classList.remove('hidden');
+        }
+    }
+    catch(error){
+        console.log(error);
+    }
 })
 
 
