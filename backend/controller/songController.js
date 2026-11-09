@@ -3,6 +3,10 @@ import {parseFile} from 'music-metadata';
 import fs from 'fs';
 import fsp from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const UploadSong = async(req,res)=>{
    try{
@@ -175,4 +179,26 @@ export const loadSongs = (req,res) =>{
 
         return res.status(500).json({message: 'Internal server error!'});
     }
+}
+
+export const playSong = (req,res) =>{
+     try{
+          const songInfo = req.body.song;
+
+          if(!songInfo){
+               return res.status(400).json({message : 'Error! empty song sent!'});
+          }
+
+          const songFile = path.resolve(__dirname, '..', '..', songInfo.songPath);
+
+          if(!fs.existsSync(songFile)){
+               return res.status(404).json({message: 'Error! Song file missing or corrupt'});
+          }
+
+          return res.sendFile(songFile)
+     }
+     catch(e){
+          console.log(e);
+          return res.status(500).json({message : 'internal server error!'});
+     }
 }

@@ -154,6 +154,30 @@
         </form>
     </div>
 
+    <div id="audioDiv">
+        <div id="audioLeft">
+            <img alt="playedSongimage">
+        </div>
+        <div id="audiomiddle">
+            <h3>song Name</h3>
+            <div id="audioBarDiv">
+                <input id="audioBar" type="range" min="0" value="0">
+                <div style="display: flex; align-items: center; margin-right: 10px;">
+                    <p id="currentDurration">0:00</p>
+                    <p>/</p>
+                    <p id="maxDurration">2:30</p>
+                </div>
+            </div>
+            
+            <div id="audiobtns">
+                <button>prev</button>
+                <button>start/pause</button>
+                <button>next</button>
+            </div>
+        </div>
+       
+    </div>
+
     <script src="./homepage/homepageScript.js"></script>
 </body>
 </html>

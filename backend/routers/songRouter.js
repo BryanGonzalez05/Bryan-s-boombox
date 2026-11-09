@@ -2,7 +2,7 @@ import express from 'express'
 const router = express.Router();
 //file handler
 import multer from 'multer';
-import {UploadSong, deleteSong, editSong, loadSongs} from '../controller/songController.js'
+import {UploadSong, deleteSong, editSong, loadSongs, playSong} from '../controller/songController.js'
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -10,10 +10,11 @@ import { fileURLToPath } from 'url';
 //check for default images 
 import { imageCheck } from '../middleware/ImageCheck.js'; 
 
-
+//songDirPath
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const songDirPath = path.join(__dirname, '..', '..', 'SongFolder')
+
 //controls where to store the file 
 const storage = multer.diskStorage({
     //sets the destination of where to store the file
@@ -54,6 +55,9 @@ const upload = multer({storage: storage, fileFilter: fileFilter});
 //image handling for song image 
 const songImageDir = path.join(__dirname, '..', '..', 'SongImage', 'temp');
 const storage_SongImage = multer.diskStorage({
+    //here we dont do throw error for dupe 
+    //instead songRouter handles dupes by checking temp
+    //if found in temp then we just use the img file already stored
     destination:  function (req, file, callback){
         callback(null, songImageDir);
     },
@@ -81,6 +85,7 @@ router.post('/UploadSong', upload.single('file'), UploadSong);
 router.delete('/deleteSong', deleteSong);
 router.put('/editSong/:id', upload2.single('file'), editSong);
 router.get('/loadSongs/:offset', imageCheck, loadSongs);
+router.get('/playSong', playSong);
 //create a router that PUTS a new default image
 
 export default router;
