@@ -39,7 +39,6 @@ const observer = new IntersectionObserver(async(entries) =>{
                     song_offset += 100;
                 }
                 else if(response.status === 503){
-                    console.log('error here');
                     document.body.style.overflow = 'hidden';
                     MissingContainer.classList.remove('hidden');
                     song_library_anchor.classList.add('hidden');
@@ -148,6 +147,8 @@ MissingformDiv.addEventListener('submit', async (e)=>{
 })
 
 
+//Hover song effect
+
 
 //create the new song elements to song body
 function add_new_song_div(s){
@@ -158,8 +159,11 @@ function add_new_song_div(s){
     new_song_div.classList.add('song-div');
     new_song_div.dataset.songID = s.songID;
     new_song_div.innerHTML = `
-        <div class="left">
-                <img src="${fetchImage}" alt="song image">
+            <div class="left">
+                <div class="imgDiv">
+                    <img src= "${fetchImage}" alt="song image">
+                    <div class="playedSong"></div>
+                </div>
                 <div class="songInfo">
                     <p>${s.songName}</p>
                     <p>${s.artistName}</p>

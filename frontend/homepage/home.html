@@ -7,12 +7,13 @@
     <link rel="stylesheet" href="./homepage/song-form.css">
 </head>
 <body>
-    <header>
-        <div id="header">
+    <header id="header">
+        <div id="innerHeader">
             <button id="songPageBTN" class="active">Songs</button>
             <button id="playlistPageBTN">Playlists</button>
             <button id="activationBTN">Add song</button>
         </div>
+            
 
         <form id="search-div">
             <input type="search" placeholder="Search song from library" id="search-bar">
@@ -25,11 +26,16 @@
 
         <div class="song-div">
             <div class="left">
-                <img alt="song image">
+                <div class="imgDiv">
+                    <img alt="song image">
+                    <div class="playedSong"></div>
+                </div>
+                
                 <div class="songInfo">
                     <p>Flashing lights</p>
                     <p>kanye west</p>
                 </div>
+               
             </div>
             <div class="right">
                 <button class="optionBTN">...</button>
@@ -39,7 +45,10 @@
 
         <div class="song-div">
             <div class="left">
-                <img alt="song image">
+                <div class="imgDiv">
+                    <img alt="song image">
+                    <div class="playedSong"></div>
+                </div>
                 <div class="songInfo">
                     <p>punch drunk</p>
                     <p>kanye west</p>
@@ -53,7 +62,10 @@
 
         <div class="song-div">
             <div class="left">
-                <img alt="song image">
+                <div class="imgDiv">
+                    <img alt="song image">
+                    <div class="playedSong"></div>
+                </div>
                 <div class="songInfo">
                     <p>punch drunk</p>
                     <p>kanye west</p>
