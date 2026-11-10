@@ -291,5 +291,45 @@ submit_song_form.addEventListener('submit', async(event)=>{
 })
 
 
+//play song
+const audioDiv = document.getElementById('audioDiv');
+const playingSongImage = document.getElementById('playingSongImage');
+const audioBar = document.getElementById('audioBar');
+const maxDurration = document.getElementById('maxDurration');
+const currentDurration = document.getElementById('currentDurration');
+const songtitle = document.getElementById('songtitle');
+songLib_body.forEach(sDiv=>{
+    sDiv.addEventListener('click',async()=>{
+        
+        const selectedSongID = sDiv.dataset.songID;
+
+        const url = `http://localhost:5000/song/playSong/${selectedSongID}`;
+
+        try{
+            const response = await fetch(url,{
+                method : 'GET'
+            })
+            
+            const data = await response.json();
+
+            if(response.ok){
+                if(audioDiv.classList.contains('hidden')){
+                    audioDiv.classList.remove('hidden');
+                }
+
+                const fetchImage = `http://localhost:5000/${data.imagePath}`;
+                playingSongImage.src = fetchImage;
+                songtitle.text = data.songName;
+                currentDurration.text = '0:00';
+                maxDurration.text = String (data.duration);
+            }
+        }
+        catch(err){
+            console.log(err);
+        }
+
+    })
+})
+
 
 

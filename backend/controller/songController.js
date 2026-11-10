@@ -183,13 +183,20 @@ export const loadSongs = (req,res) =>{
 
 export const playSong = (req,res) =>{
      try{
-          const songInfo = req.body.song;
+          const songId = req.param.id;
 
-          if(!songInfo){
+          if(!songId){
                return res.status(400).json({message : 'Error! empty song sent!'});
           }
 
-          const songFile = path.resolve(__dirname, '..', '..', songInfo.songPath);
+          const songData = db.prepare(`select * from songLib where songID = ?`).get(songId);
+
+          if(!songData){
+               return res.status(404).json({message: 'Error! song does not exist!'});
+          }
+
+          
+          const songFile = path.resolve(__dirname, '..', '..', songData.songPath);
 
           if(!fs.existsSync(songFile)){
                return res.status(404).json({message: 'Error! Song file missing or corrupt'});

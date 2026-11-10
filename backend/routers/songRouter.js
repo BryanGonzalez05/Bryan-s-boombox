@@ -85,7 +85,7 @@ router.post('/UploadSong', upload.single('file'), UploadSong);
 router.delete('/deleteSong', deleteSong);
 router.put('/editSong/:id', upload2.single('file'), editSong);
 router.get('/loadSongs/:offset', imageCheck, loadSongs);
-router.get('/playSong', playSong);
+router.get('/playSong/:id', playSong);
 //create a router that PUTS a new default image
 
 export default router;
