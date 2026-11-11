@@ -2,6 +2,9 @@
 let song_offset = 0;
 let playlist_offset = 0;
 
+const songArr = [];
+let songIndex;
+const audio = new Audio();
 const songMap = new Map();
 
 
@@ -23,6 +26,8 @@ const observer = new IntersectionObserver(async(entries) =>{
                 
                 if(response.success){
                     response.songs.forEach(song=>{
+                        songArr.push(song);
+                        /*
                         songMap.set(song.songID,{   
                                 songID : song.songID,
                                 songName : song.songName,
@@ -31,11 +36,12 @@ const observer = new IntersectionObserver(async(entries) =>{
                                 imagePath : song.imagePath,
                                 songPath : song.songPath
                             })
-
+                        */
                         add_new_song_div(song);
                     })
-
-                    console.log(songMap);
+                    
+                    console.log(songArr);
+                    //console.log(songMap);
                     song_offset += 100;
                 }
                 else if(response.status === 503){
@@ -292,43 +298,61 @@ submit_song_form.addEventListener('submit', async(event)=>{
 
 
 //play song
+
+
 const audioDiv = document.getElementById('audioDiv');
 const playingSongImage = document.getElementById('playingSongImage');
 const audioBar = document.getElementById('audioBar');
 const maxDurration = document.getElementById('maxDurration');
 const currentDurration = document.getElementById('currentDurration');
 const songtitle = document.getElementById('songtitle');
-songLib_body.forEach(sDiv=>{
-    sDiv.addEventListener('click',async()=>{
+const songDiv = songLib_body.querySelectorAll('.song-div');
+songLib_body.addEventListener('click',async(event)=>{
         
-        const selectedSongID = sDiv.dataset.songID;
+    const songD = event.target.closest('.song-div');
 
-        const url = `http://localhost:5000/song/playSong/${selectedSongID}`;
+    if(songD){
+
+        const selectedSongID = Number(songD.dataset.songID);
+
+        songIndex = songArr.findIndex(s => s.songID === selectedSongID);
+
+        if(songIndex === -1){
+            console.log("error");
+            return;
+        }
+
+        const url = `http://localhost:5000/song/playSong`;
 
         try{
             const response = await fetch(url,{
-                method : 'GET'
+                method : 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({songPath : songArr[songIndex].songPath})
             })
             
-            const data = await response.json();
+            const data = await response.blob();
 
             if(response.ok){
                 if(audioDiv.classList.contains('hidden')){
                     audioDiv.classList.remove('hidden');
                 }
 
-                const fetchImage = `http://localhost:5000/${data.imagePath}`;
+                
+                const fetchImage = `http://localhost:5000/${songArr[songIndex].imagePath}`;
                 playingSongImage.src = fetchImage;
-                songtitle.text = data.songName;
+                songtitle.text = songArr[songIndex].songName;
                 currentDurration.text = '0:00';
-                maxDurration.text = String (data.duration);
+                maxDurration.text = String (songArr[songIndex].duration);
+                audio.src = URL.createObjectURL(data);
+                audio.play();
             }
         }
         catch(err){
             console.log(err);
         }
+    }
 
-    })
 })
 
 
