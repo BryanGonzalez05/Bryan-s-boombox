@@ -4,9 +4,20 @@ let playlist_offset = 0;
 
 const songArr = [];
 let songIndex;
+let currentUrlSongPlaying;
 const audio = new Audio();
 const songMap = new Map();
 
+
+//time calcuation to seconds functions
+function setTime(durration){
+    let seconds;
+    let minutes;
+
+    seconds = Math.floor(durration % 60);
+    minutes = Math.floor(durration / 60);
+    return `${minutes}:${String(seconds).padStart(2,'0')}`
+}
 
 //fire load function when anchor is in view port
 const song_library_anchor = document.getElementById('song-library-anchor');
@@ -153,7 +164,6 @@ MissingformDiv.addEventListener('submit', async (e)=>{
 })
 
 
-//Hover song effect
 
 
 //create the new song elements to song body
@@ -177,7 +187,7 @@ function add_new_song_div(s){
             </div>
             <div class="right">
                 <button class="optionBTN">...</button>
-                <p>${s.duration}</p>
+                <p>${setTime(s.duration)}</p>
             </div>
     `;
 
@@ -190,7 +200,6 @@ const playlistPageBTN = document.getElementById('playlistPageBTN');
 let currentPage = 'none';
 
 if(songPageBTN.classList.contains('active')) {
-    console.log('song page btn');
     currentPage = 'song';
     observer.observe(song_library_anchor);
 
@@ -298,8 +307,6 @@ submit_song_form.addEventListener('submit', async(event)=>{
 
 
 //play song
-
-
 const audioDiv = document.getElementById('audioDiv');
 const playingSongImage = document.getElementById('playingSongImage');
 const audioBar = document.getElementById('audioBar');
@@ -307,11 +314,17 @@ const maxDurration = document.getElementById('maxDurration');
 const currentDurration = document.getElementById('currentDurration');
 const songtitle = document.getElementById('songtitle');
 const songDiv = songLib_body.querySelectorAll('.song-div');
+
+//pause btns
+const pauseBTN = document.getElementById('pause');
+const playBTN = document.getElementById('play');
+
 songLib_body.addEventListener('click',async(event)=>{
-        
+    
     const songD = event.target.closest('.song-div');
 
     if(songD){
+
 
         const selectedSongID = Number(songD.dataset.songID);
 
@@ -338,14 +351,25 @@ songLib_body.addEventListener('click',async(event)=>{
                     audioDiv.classList.remove('hidden');
                 }
 
-                
+                //if trying to play another song and there is already one playing or loaded
+                //remove it to load the next one
+                if(currentUrlSongPlaying){
+                   URL.revokeObjectURL(currentUrlSongPlaying);
+                }
+
+                currentUrlSongPlaying = URL.createObjectURL(data);
+
                 const fetchImage = `http://localhost:5000/${songArr[songIndex].imagePath}`;
+                console.log(fetchImage);
                 playingSongImage.src = fetchImage;
-                songtitle.text = songArr[songIndex].songName;
-                currentDurration.text = '0:00';
-                maxDurration.text = String (songArr[songIndex].duration);
-                audio.src = URL.createObjectURL(data);
-                audio.play();
+
+                songtitle.textContent = songArr[songIndex].songName;
+                currentDurration.textContent = '0:00';
+                //maxDurration.textContent = String (songArr[songIndex].duration);
+                audio.src = currentUrlSongPlaying;
+                await audio.play();
+                playBTN.classList.add('hidden');
+                pauseBTN.classList.remove('hidden');
             }
         }
         catch(err){
@@ -356,4 +380,89 @@ songLib_body.addEventListener('click',async(event)=>{
 })
 
 
+//pause song
+const pauseplayDIV = document.getElementById('pauseplayDIV');
+pauseplayDIV.addEventListener('click', async(e)=>{
+    try{
 
+        if(e.target.closest('#pause')){
+            await audio.pause();
+            pauseBTN.classList.add('hidden');
+            playBTN.classList.remove('hidden');
+        }
+        else if(e.target.closest('#play')){
+            await audio.play();
+            playBTN.classList.add('hidden');
+            pauseBTN.classList.remove('hidden');
+        }
+
+    }
+    catch(e){
+        console.log(e);
+    }
+})
+
+//audio bar function
+
+
+audio.addEventListener('timeupdate', ()=>{
+    audioBar.value = audio.currentTime;
+    currentDurration.textContent = setTime(audio.currentTime);
+})
+
+audio.addEventListener('loadedmetadata', ()=>{
+    audioBar.max = audio.duration;
+    maxDurration.textContent = setTime(audio.duration);
+})
+
+audioBar.addEventListener('input', ()=>{
+    audio.currentTime = audioBar.value;
+})
+
+audio.addEventListener('ended', async()=>{
+    console.log('songFinished');
+
+    songIndex = (songIndex + 1) %  songArr.length;
+
+    const url = `http://localhost:5000/song/playSong`;
+
+        try{
+            const response = await fetch(url,{
+                method : 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({songPath : songArr[songIndex].songPath})
+            })
+            
+            const data = await response.blob();
+
+            if(response.ok){
+                if(audioDiv.classList.contains('hidden')){
+                    audioDiv.classList.remove('hidden');
+                }
+
+                //if trying to play another song and there is already one playing or loaded
+                //remove it to load the next one
+                if(currentUrlSongPlaying){
+                   URL.revokeObjectURL(currentUrlSongPlaying);
+                }
+
+                currentUrlSongPlaying = URL.createObjectURL(data);
+
+                const fetchImage = `http://localhost:5000/${songArr[songIndex].imagePath}`;
+                console.log(fetchImage);
+                playingSongImage.src = fetchImage;
+
+                songtitle.textContent = songArr[songIndex].songName;
+                currentDurration.textContent = '0:00';
+                //maxDurration.textContent = String (songArr[songIndex].duration);
+                audio.src = currentUrlSongPlaying;
+                await audio.play();
+                playBTN.classList.add('hidden');
+                pauseBTN.classList.remove('hidden');
+            }
+        }
+        catch(err){
+            console.log(err);
+        }
+
+})

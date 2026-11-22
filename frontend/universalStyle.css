@@ -318,6 +318,15 @@ body{
     margin-inline: 20px
 }
 
+#audiobtns{
+    display: flex;
+    gap: 5px;
+}
+
+#songtitle{
+    margin: 0;
+}
+
 @media screen and (max-width: 600px){
         #audioDiv{
     position: fixed;
